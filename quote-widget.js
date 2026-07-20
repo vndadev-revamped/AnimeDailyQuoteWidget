@@ -8,6 +8,7 @@ const path = require('path');
 const CONFIG = {
     DISCORD_TOKEN: process.env.DISCORD_TOKEN || '',
     DISCORD_USER_ID: process.env.DISCORD_USER_ID || '',
+    DISCORD_APPLICATION_ID: process.env.DISCORD_APPLICATION_ID || '',
 };
 
 // !!! CAMBIA ESTO POR TU USUARIO DE GITHUB !!!
@@ -107,7 +108,12 @@ function generatePayload(quote, character, anime) {
         }
     }
 
-    return { data: { dynamic } };
+    return { 
+        data: { 
+            dynamic,
+            application_id: CONFIG.DISCORD_APPLICATION_ID
+        } 
+    };
 }
 
 // ============================================
@@ -116,6 +122,16 @@ function generatePayload(quote, character, anime) {
 async function updateDailyQuote() {
     try {
         console.log('🚀 Iniciando actualización del widget...');
+        
+        // Validar credenciales
+        if (!CONFIG.DISCORD_TOKEN || !CONFIG.DISCORD_USER_ID || !CONFIG.DISCORD_APPLICATION_ID) {
+            console.log('\n❌ Error: Faltan credenciales de Discord');
+            console.log('   Asegúrate de configurar:');
+            console.log('   - DISCORD_TOKEN');
+            console.log('   - DISCORD_USER_ID');
+            console.log('   - DISCORD_APPLICATION_ID');
+            process.exit(1);
+        }
         
         // 1. Leer citas
         const quotesPath = path.join(__dirname, 'quotes.json');
@@ -155,12 +171,6 @@ async function updateDailyQuote() {
         console.log(JSON.stringify(payload, null, 2));
         
         // 6. Enviar a Discord
-        if (!CONFIG.DISCORD_TOKEN || !CONFIG.DISCORD_USER_ID) {
-            console.log('\n❌ Error: Faltan credenciales de Discord');
-            console.log('   Asegúrate de configurar DISCORD_TOKEN y DISCORD_USER_ID');
-            process.exit(1);
-        }
-        
         await sendToDiscord(payload);
         
         console.log('\n✅ Widget actualizado correctamente');

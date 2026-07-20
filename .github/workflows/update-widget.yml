@@ -1,0 +1,25 @@
+name: Actualizar Widget Diario
+
+on:
+  schedule:
+    - cron: "0 0 */1 * *"
+  workflow_dispatch:      # Ejecución manual desde GitHub
+
+jobs:
+  update-widget:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v3
+      
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Ejecutar script
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          DISCORD_USER_ID: ${{ secrets.DISCORD_USER_ID }}
+        run: node quote-widget.js

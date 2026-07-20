@@ -1,0 +1,10 @@
+{
+  "name": "anime-daily-quote-widget",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Widget diario de citas de anime para perfil de Discord",
+  "scripts": {
+    "start": "node quote-widget.js",
+    "test": "node quote-widget.js"
+  }
+}

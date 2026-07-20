@@ -1,4 +1,6 @@
 const https = require('https');
+const fs = require('fs');
+const path = require('path');
 
 // Configuración desde Variables de Entorno
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
@@ -10,130 +12,34 @@ const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || 'TU_USUARIO/TU_REPO';
 const [githubUser, repoName] = GITHUB_REPOSITORY.split('/');
 const branch = 'main'; 
 
-// --- DATOS HARDCODEADOS (FUENTE DE VERDAD) ---
-// Cada objeto contiene TODOS los datos coherentes de un personaje.
-const QUOTES_DATA = [
-  { 
-    quote: "As long as you are by my side, I do not care about what others think.", 
-    character: "Nino Nakano", 
-    anime: "The Quintessential Quintuplets", 
-    imageKey: "nino" 
-  },
-  { 
-    quote: "Even if only one person in the world cared about me, I could keep living for that person.", 
-    character: "Miku Nakano", 
-    anime: "The Quintessential Quintuplets", 
-    imageKey: "miku" 
-  },
-  { 
-    quote: "Even if I'm not the chosen one, I'll still fight for my future.", 
-    character: "Itsuki Nakano", 
-    anime: "The Quintessential Quintuplets", 
-    imageKey: "itsuki" 
-  },
-  { 
-    quote: "I'm not gonna run away, I never go back on my word! That's my nindo: my ninja way!", 
-    character: "Yotsuba Nakano", 
-    anime: "The Quintessential Quintuplets", 
-    imageKey: "yotsuba" 
-  },
-  { 
-    quote: "I love you more than anyone else in the world.", 
-    character: "Ai Hoshino", 
-    anime: "Oshi no Ko", 
-    imageKey: "ai" 
-  },
-  { 
-    quote: "I will become the best idol in the world.", 
-    character: "Aqua Hoshino", 
-    anime: "Oshi no Ko", 
-    imageKey: "aqua" 
-  },
-  { 
-    quote: "Acting is lying to tell the truth.", 
-    character: "Kana Arima", 
-    anime: "Oshi no Ko", 
-    imageKey: "kana" 
-  },
-  { 
-    quote: "Sometimes the truth hurts, but it's better than a lie.", 
-    character: "Akane Kurokawa", 
-    anime: "Oshi no Ko", 
-    imageKey: "akane" 
-  },
-  { 
-    quote: "Magic is something you do with your heart.", 
-    character: "Frieren", 
-    anime: "Frieren: Beyond Journey's End", 
-    imageKey: "frieren" 
-  },
-  { 
-    quote: "The strong survive, the weak perish.", 
-    character: "Kiyotaka Ayanokoji", 
-    anime: "Classroom of the Elite", 
-    imageKey: "ayanokoji" 
-  },
-  { 
-    quote: "I don't like relying on others, but I guess it's not so bad.", 
-    character: "Suzune Horikita", 
-    anime: "Classroom of the Elite", 
-    imageKey: "horikita" 
-  },
-  { 
-    quote: "Let's make some cute clothes together!", 
-    character: "Marin Kitagawa", 
-    anime: "My Dress-Up Darling", 
-    imageKey: "marin" 
-  },
-  { 
-    quote: "Love isn't about logic, it's about feeling.", 
-    character: "Kaoruko Waguri", 
-    anime: "My Love Story with Yamada-kun at Lv999", 
-    imageKey: "kaoruko" 
-  },
-  { 
-    quote: "I'll lend you my umbrella, but don't get the wrong idea.", 
-    character: "Yukino Yukinoshita", 
-    anime: "Oregairu", 
-    imageKey: "yukino" 
-  },
-  { 
-    quote: "Being alone isn't the problem. Feeling lonely is.", 
-    character: "Mai Sakurajima", 
-    anime: "Bunny Girl Senpai", 
-    imageKey: "mai" 
-  },
-  { 
-    quote: "I'm not good at being honest, okay?", 
-    character: "Kyouko Hori", 
-    anime: "Horimiya", 
-    imageKey: "hori" 
-  },
-  { 
-    quote: "Darling, let's dance!", 
-    character: "Zero Two", 
-    anime: "Darling in the FranXX", 
-    imageKey: "zerotwo" 
-  },
-  { 
-    quote: "See you on the flip side.", 
-    character: "Lucy", 
-    anime: "Cyberpunk: Edgerunners", 
-    imageKey: "lucy" 
-  },
-  { 
-    quote: "I'll take the bullet for you.", 
-    character: "David Martinez", 
-    anime: "Cyberpunk: Edgerunners", 
-    imageKey: "david" 
-  },
-  { 
-    quote: "You're never alone as long as you have friends.", 
-    character: "Rebecca", 
-    anime: "Cyberpunk: Edgerunners", 
-    imageKey: "rebecca" 
-  }
-];
+// --- CARGAR DATOS DESDE quotes.json ---
+// La única fuente de verdad es quotes.json
+const quotesFilePath = path.join(__dirname, 'quotes.json');
+const QUOTES_DATA_RAW = JSON.parse(fs.readFileSync(quotesFilePath, 'utf8'));
+
+// Mapeo de nombres de personajes a keys de imagen
+const CHARACTER_TO_IMAGE_KEY = {
+  "Miku Nakano": "miku",
+  "Nino Nakano": "nino",
+  "Itsuki Nakano": "itsuki",
+  "Yotsuba Nakano": "yotsuba",
+  "Ai Hoshino": "ai",
+  "Aqua Hoshino": "aqua",
+  "Kana Arima": "kana",
+  "Akane Kurokawa": "akane",
+  "Frieren": "frieren",
+  "Kiyotaka Ayanokoji": "ayanokoji",
+  "Suzune Horikita": "horikita",
+  "Marin Kitagawa": "marin",
+  "Kaoruko Waguri": "kaoruko",
+  "Yukino Yukinoshita": "yukino",
+  "Mai Sakurajima": "mai",
+  "Hori Kyouko": "hori",
+  "Zero Two": "zerotwo",
+  "Lucy": "lucy",
+  "David Martinez": "david",
+  "Rebecca": "rebecca"
+};
 
 // Mapeo de keys a nombres de archivo de imagen (deben coincidir con los archivos en /images/)
 const IMAGE_MAP = {
@@ -165,12 +71,27 @@ function log(...args) {
 }
 
 /**
- * Selecciona un elemento ALEATORIO del array.
- * Esto garantiza que Cita, Personaje, Anime e Imagen vengan del MISMO objeto.
+ * Selecciona un elemento ALEATORIO del array QUOTES_DATA_RAW.
+ * Esto garantiza que Cita, Personaje y Anime vengan del MISMO objeto en quotes.json.
  */
 function getRandomQuote() {
-  const randomIndex = Math.floor(Math.random() * QUOTES_DATA.length);
-  return QUOTES_DATA[randomIndex];
+  const randomIndex = Math.floor(Math.random() * QUOTES_DATA_RAW.length);
+  const quoteEntry = QUOTES_DATA_RAW[randomIndex];
+  
+  // Obtener la imageKey desde el mapeo de personajes
+  const imageKey = CHARACTER_TO_IMAGE_KEY[quoteEntry.character];
+  
+  if (!imageKey) {
+    log(`⚠️ WARNING: No image mapping found for character "${quoteEntry.character}".`);
+  }
+  
+  // Retornar un objeto con la estructura esperada por buildPayload
+  return {
+    quote: quoteEntry.quote,
+    character: quoteEntry.character,
+    anime: quoteEntry.anime,
+    imageKey: imageKey
+  };
 }
 
 function buildPayload(quoteData) {

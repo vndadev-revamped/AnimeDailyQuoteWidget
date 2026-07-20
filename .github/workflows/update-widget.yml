@@ -1,25 +1,23 @@
-name: Actualizar Widget Diario
+name: Update Anime Quote Widget
 
 on:
   schedule:
-    - cron: "0 0 */1 * *"
-  workflow_dispatch:      # Ejecución manual desde GitHub
+    - cron: "0 0 */1 * *"   # every day at 00:00 UTC
+  workflow_dispatch:        # manual trigger
 
 jobs:
-  update-widget:
+  update:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Clonar repositorio
-        uses: actions/checkout@v3
-      
-      - name: Configurar Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      
-      - name: Ejecutar script
+          node-version: 22
+
+      - name: Run Anime Quote Widget Script
+        run: node quote-widget.js
         env:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          DISCORD_APPLICATION_ID: ${{ secrets.DISCORD_APPLICATION_ID }}
           DISCORD_USER_ID: ${{ secrets.DISCORD_USER_ID }}
-        run: node quote-widget.js

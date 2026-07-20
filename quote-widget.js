@@ -41,9 +41,16 @@ function log(message) {
 }
 
 // ── Image Base URL ────────────────────────────────────────────────
-// !!! CAMBIA ESTO POR TU USUARIO DE GITHUB !!!
-const GITHUB_USERNAME = "TU_USUARIO";
-const IMAGE_BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/AnimeQuotesDailyWidget/main/images`;
+// Usa GITHUB_REPOSITORY (ej: "usuario/repo") para obtener el username automáticamente
+const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || "";
+const GITHUB_USERNAME = GITHUB_REPOSITORY.split('/')[0];
+
+if (!GITHUB_USERNAME) {
+  throw new Error("GITHUB_REPOSITORY no está disponible. Asegúrate de correr esto en GitHub Actions.");
+}
+
+const REPO_NAME = GITHUB_REPOSITORY.split('/')[1] || "AnimeQuotesDailyWidget";
+const IMAGE_BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/main/images`;
 
 // ── URLs DE LAS IMÁGENES ──────────────────────────────────────────
 
@@ -128,12 +135,13 @@ function generatePayload(quote, character, anime) {
     { type: 1, name: "anime_name", value: anime }
   ];
 
-  for (const [key, url] of Object.entries(imageUrls)) {
-    if (key === heroField || key === smallField) {
-      dynamic.push({ type: 3, name: key, value: { url: url } });
-    } else {
-      dynamic.push({ type: 3, name: key, value: { url: "" } });
-    }
+  // Solo agregar las imágenes del personaje seleccionado (max 2 imágenes)
+  // Esto evita exceder el límite de 30 elementos de Discord
+  if (heroField && imageUrls[heroField]) {
+    dynamic.push({ type: 3, name: heroField, value: { url: imageUrls[heroField] } });
+  }
+  if (smallField && imageUrls[smallField]) {
+    dynamic.push({ type: 3, name: smallField, value: { url: imageUrls[smallField] } });
   }
 
   return { 

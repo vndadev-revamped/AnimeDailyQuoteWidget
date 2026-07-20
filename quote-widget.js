@@ -235,8 +235,8 @@ function buildPayload(quoteData) {
 
 async function updateDiscordWidget(payload) {
   return new Promise((resolve, reject) => {
-    // Endpoint corregido para actualizar la configuración del widget
-    const path = `/api/v10/applications/${DISCORD_APPLICATION_ID}/widget`;
+    // Endpoint corregido para actualizar el perfil del usuario con widget
+    const path = `/api/v10/applications/${DISCORD_APPLICATION_ID}/users/${DISCORD_USER_ID}/identities/0/profile`;
     
     const options = {
       hostname: 'discord.com',
@@ -246,7 +246,8 @@ async function updateDiscordWidget(payload) {
       headers: {
         'Authorization': `Bot ${DISCORD_TOKEN}`,
         'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(JSON.stringify(payload))
+        'Content-Length': Buffer.byteLength(JSON.stringify(payload)),
+        'User-Agent': 'DiscordBot (https://github.com/discord/discord-api-docs, 1.0.0)'
       }
     };
 

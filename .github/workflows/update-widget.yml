@@ -21,3 +21,4 @@ jobs:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           DISCORD_APPLICATION_ID: ${{ secrets.DISCORD_APPLICATION_ID }}
           DISCORD_USER_ID: ${{ secrets.DISCORD_USER_ID }}
+          GITHUB_REPOSITORY: ${{ github.repository }}

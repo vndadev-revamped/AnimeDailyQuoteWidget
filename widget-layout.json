@@ -49,7 +49,7 @@
             "image": {
               "value_type": "data",
               "presentation_type": "image",
-              "value": "change this to an image"
+              "value": "hero_image"
             }
           }
         }

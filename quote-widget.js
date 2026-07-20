@@ -1,248 +1,196 @@
-// quote-widget.js
-// Anime Quote → Discord Widget Updater
-// Runs in GitHub Actions — one-shot script, no local persistence
-//
-// Prerequisites (one-time manual setup):
-//   1. Get your Discord Application ID, Bot Token, and User ID
-//   2. Add them to GitHub Secrets
-//
-// This script:
-//   1. Reads quotes from quotes.json
-//   2. Selects a random quote
-//   3. Builds the Discord widget payload
-//   4. PATCHes your Discord application profile widget
+const https = require('https');
 
-// ── Environment Variables ──────────────────────────────────────────
+// Configuración desde Variables de Entorno
+const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
+const DISCORD_APPLICATION_ID = process.env.DISCORD_APPLICATION_ID;
+const DISCORD_USER_ID = process.env.DISCORD_USER_ID;
+const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || 'TU_USUARIO/TU_REPO';
 
-const {
-  DISCORD_TOKEN,
-  DISCORD_APPLICATION_ID,
-  DISCORD_USER_ID,
-} = process.env;
+// Extraer usuario y repo para las URLs de las imágenes
+const [githubUser, repoName] = GITHUB_REPOSITORY.split('/');
+const branch = 'main'; // Asumiendo que las imágenes están en main
 
-// ── Validation ─────────────────────────────────────────────────────
-
-const requiredSecrets = [
-  "DISCORD_TOKEN",
-  "DISCORD_APPLICATION_ID",
-  "DISCORD_USER_ID",
+// --- DATOS HARDCODEADOS (FUENTE DE VERDAD) ---
+const QUOTES_DATA = [
+  { quote: "As long as you are by my side, I do not care about what others think.", character: "Nino Nakano", anime: "The Quintessential Quintuplets", imageKey: "nino" },
+  { quote: "I want to be the reason you smile.", character: "Miku Nakano", anime: "The Quintessential Quintuplets", imageKey: "miku" },
+  { quote: "Even if I'm not the chosen one, I'll still fight for my future.", character: "Itsuki Nakano", anime: "The Quintessential Quintuplets", imageKey: "itsuki" },
+  { quote: "I'm not gonna run away, I never go back on my word! That's my nindo: my ninja way!", character: "Yotsuba Nakano", anime: "The Quintessential Quintuplets", imageKey: "yotsuba" },
+  { quote: "I love you more than anyone else in the world.", character: "Ai Hoshino", anime: "Oshi no Ko", imageKey: "ai" },
+  { quote: "I will become the best idol in the world.", character: "Aqua Hoshino", anime: "Oshi no Ko", imageKey: "aqua" },
+  { quote: "Acting is lying to tell the truth.", character: "Kana Arima", anime: "Oshi no Ko", imageKey: "kana" },
+  { quote: "Sometimes the truth hurts, but it's better than a lie.", character: "Akane Kurokawa", anime: "Oshi no Ko", imageKey: "akane" },
+  { quote: "Magic is something you do with your heart.", character: "Frieren", anime: "Frieren: Beyond Journey's End", imageKey: "frieren" },
+  { quote: "The strong survive, the weak perish.", character: "Kiyotaka Ayanokoji", anime: "Classroom of the Elite", imageKey: "ayanokoji" },
+  { quote: "I don't like relying on others, but I guess it's not so bad.", character: "Suzune Horikita", anime: "Classroom of the Elite", imageKey: "horikita" },
+  { quote: "Let's make some cute clothes together!", character: "Marin Kitagawa", anime: "My Dress-Up Darling", imageKey: "marin" },
+  { quote: "Love isn't about logic, it's about feeling.", character: "Kaoruko Waguri", anime: "My Love Story with Yamada-kun at Lv999", imageKey: "kaoruko" },
+  { quote: "I'll lend you my umbrella, but don't get the wrong idea.", character: "Yukino Yukinoshita", anime: "Oregairu", imageKey: "yukino" },
+  { quote: "Being alone isn't the problem. Feeling lonely is.", character: "Mai Sakurajima", anime: "Bunny Girl Senpai", imageKey: "mai" },
+  { quote: "I'm not good at being honest, okay?", character: "Kyouko Hori", anime: "Horimiya", imageKey: "hori" },
+  { quote: "Darling, let's dance!", character: "Zero Two", anime: "Darling in the FranXX", imageKey: "zerotwo" },
+  { quote: "See you on the flip side.", character: "Lucy", anime: "Cyberpunk: Edgerunners", imageKey: "lucy" },
+  { quote: "I'll take the bullet for you.", character: "David Martinez", anime: "Cyberpunk: Edgerunners", imageKey: "david" },
+  { quote: "You're never alone as long as you have friends.", character: "Rebecca", anime: "Cyberpunk: Edgerunners", imageKey: "rebecca" }
 ];
 
-for (const secret of requiredSecrets) {
-  if (!process.env[secret]) {
-    throw new Error(`Missing secret: ${secret}`);
-  }
-}
-
-// ── Logging ────────────────────────────────────────────────────────
-
-function log(message) {
-  console.log(`[${new Date().toISOString()}] ${message}`);
-}
-
-// ── Image Base URL ────────────────────────────────────────────────
-// Usa GITHUB_REPOSITORY (ej: "usuario/repo") para obtener el username automáticamente
-const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || "";
-const GITHUB_USERNAME = GITHUB_REPOSITORY.split('/')[0];
-
-if (!GITHUB_USERNAME) {
-  throw new Error("GITHUB_REPOSITORY no está disponible. Asegúrate de correr esto en GitHub Actions.");
-}
-
-const REPO_NAME = GITHUB_REPOSITORY.split('/')[1] || "AnimeQuotesDailyWidget";
-const IMAGE_BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/main/images`;
-
-// ── URLs DE LAS IMÁGENES ──────────────────────────────────────────
-
-const imageUrls = {
-  miku_hero: `${IMAGE_BASE_URL}/miku_hero.png`,
-  miku_small: `${IMAGE_BASE_URL}/miku_small.png`,
-  nino_hero: `${IMAGE_BASE_URL}/nino_hero.png`,
-  nino_small: `${IMAGE_BASE_URL}/nino_small.png`,
-  itsuki_hero: `${IMAGE_BASE_URL}/itsuki_hero.png`,
-  itsuki_small: `${IMAGE_BASE_URL}/itsuki_small.png`,
-  yotsuba_hero: `${IMAGE_BASE_URL}/yotsuba_hero.png`,
-  yotsuba_small: `${IMAGE_BASE_URL}/yotsuba_small.png`,
-  ai_hero: `${IMAGE_BASE_URL}/ai_hero.png`,
-  ai_small: `${IMAGE_BASE_URL}/ai_small.png`,
-  aqua_hero: `${IMAGE_BASE_URL}/aqua_hero.png`,
-  aqua_small: `${IMAGE_BASE_URL}/aqua_small.png`,
-  kana_hero: `${IMAGE_BASE_URL}/kana_hero.png`,
-  kana_small: `${IMAGE_BASE_URL}/kana_small.png`,
-  akane_hero: `${IMAGE_BASE_URL}/akane_hero.png`,
-  akane_small: `${IMAGE_BASE_URL}/akane_small.png`,
-  frieren_hero: `${IMAGE_BASE_URL}/frieren_hero.png`,
-  frieren_small: `${IMAGE_BASE_URL}/frieren_small.png`,
-  ayanokoji_hero: `${IMAGE_BASE_URL}/ayanokoji_hero.png`,
-  ayanokoji_small: `${IMAGE_BASE_URL}/ayanokoji_small.png`,
-  horikita_hero: `${IMAGE_BASE_URL}/horikita_hero.png`,
-  horikita_small: `${IMAGE_BASE_URL}/horikita_small.png`,
-  marin_hero: `${IMAGE_BASE_URL}/marin_hero.png`,
-  marin_small: `${IMAGE_BASE_URL}/marin_small.png`,
-  kaoruko_hero: `${IMAGE_BASE_URL}/kaoruko_hero.png`,
-  kaoruko_small: `${IMAGE_BASE_URL}/kaoruko_small.png`,
-  yukino_hero: `${IMAGE_BASE_URL}/yukino_hero.png`,
-  yukino_small: `${IMAGE_BASE_URL}/yukino_small.png`,
-  mai_hero: `${IMAGE_BASE_URL}/mai_hero.png`,
-  mai_small: `${IMAGE_BASE_URL}/mai_small.png`,
-  hori_hero: `${IMAGE_BASE_URL}/hori_hero.png`,
-  hori_small: `${IMAGE_BASE_URL}/hori_small.png`,
-  zerotwo_hero: `${IMAGE_BASE_URL}/zerotwo_hero.png`,
-  zerotwo_small: `${IMAGE_BASE_URL}/zerotwo_small.png`,
-  lucy_hero: `${IMAGE_BASE_URL}/lucy_hero.png`,
-  lucy_small: `${IMAGE_BASE_URL}/lucy_small.png`,
-  david_hero: `${IMAGE_BASE_URL}/david_hero.png`,
-  david_small: `${IMAGE_BASE_URL}/david_small.png`,
-  rebecca_hero: `${IMAGE_BASE_URL}/rebecca_hero.png`,
-  rebecca_small: `${IMAGE_BASE_URL}/rebecca_small.png`
+// Mapeo de keys a nombres de archivo de imagen (minúsculas, sin extensión)
+const IMAGE_MAP = {
+  nino: { hero: 'nino_hero', small: 'nino_small' },
+  miku: { hero: 'miku_hero', small: 'miku_small' },
+  itsuki: { hero: 'itsuki_hero', small: 'itsuki_small' },
+  yotsuba: { hero: 'yotsuba_hero', small: 'yotsuba_small' },
+  ai: { hero: 'ai_hero', small: 'ai_small' },
+  aqua: { hero: 'aqua_hero', small: 'aqua_small' },
+  kana: { hero: 'kana_hero', small: 'kana_small' },
+  akane: { hero: 'akane_hero', small: 'akane_small' },
+  frieren: { hero: 'frieren_hero', small: 'frieren_small' },
+  ayanokoji: { hero: 'ayanokoji_hero', small: 'ayanokoji_small' },
+  horikita: { hero: 'horikita_hero', small: 'horikita_small' },
+  marin: { hero: 'marin_hero', small: 'marin_small' },
+  kaoruko: { hero: 'kaoruko_hero', small: 'kaoruko_small' },
+  yukino: { hero: 'yukino_hero', small: 'yukino_small' },
+  mai: { hero: 'mai_hero', small: 'mai_small' },
+  hori: { hero: 'hori_hero', small: 'hori_small' },
+  zerotwo: { hero: 'zerotwo_hero', small: 'zerotwo_small' },
+  lucy: { hero: 'lucy_hero', small: 'lucy_small' },
+  david: { hero: 'david_hero', small: 'david_small' },
+  rebecca: { hero: 'rebecca_hero', small: 'rebecca_small' }
 };
 
-// ── MAPEO DE PERSONAJES A NOMBRES DE CAMPOS ───────────────────────
+function log(...args) {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}]`, ...args);
+}
 
-const characterMapping = {
-  "Miku Nakano": { hero: "miku_hero", small: "miku_small" },
-  "Nino Nakano": { hero: "nino_hero", small: "nino_small" },
-  "Itsuki Nakano": { hero: "itsuki_hero", small: "itsuki_small" },
-  "Yotsuba Nakano": { hero: "yotsuba_hero", small: "yotsuba_small" },
-  "Ai Hoshino": { hero: "ai_hero", small: "ai_small" },
-  "Frieren": { hero: "frieren_hero", small: "frieren_small" },
-  "Kiyotaka Ayanokoji": { hero: "ayanokoji_hero", small: "ayanokoji_small" },
-  "Suzune Horikita": { hero: "horikita_hero", small: "horikita_small" },
-  "Marin Kitagawa": { hero: "marin_hero", small: "marin_small" },
-  "Kaoruko Waguri": { hero: "kaoruko_hero", small: "kaoruko_small" },
-  "Yukino Yukinoshita": { hero: "yukino_hero", small: "yukino_small" },
-  "Mai Sakurajima": { hero: "mai_hero", small: "mai_small" },
-  "Hori Kyouko": { hero: "hori_hero", small: "hori_small" },
-  "Kana Arima": { hero: "kana_hero", small: "kana_small" },
-  "Akane Kurokawa": { hero: "akane_hero", small: "akane_small" },
-  "Aqua Hoshino": { hero: "aqua_hero", small: "aqua_small" },
-  "Zero Two": { hero: "zerotwo_hero", small: "zerotwo_small" },
-  "Lucy": { hero: "lucy_hero", small: "lucy_small" },
-  "David Martinez": { hero: "david_hero", small: "david_small" },
-  "Rebecca": { hero: "rebecca_hero", small: "rebecca_small" }
-};
+function getRandomQuote() {
+  const today = new Date();
+  // Usar el día del año como seed para que sea constante durante 24h
+  const start = new Date(today.getFullYear(), 0, 0);
+  const diff = today - start;
+  const oneDay = 1000 * 60 * 60 * 24;
+  const dayOfYear = Math.floor(diff / oneDay);
+  
+  const index = dayOfYear % QUOTES_DATA.length;
+  return QUOTES_DATA[index];
+}
 
-// ── GENERAR PAYLOAD ───────────────────────────────────────────────
+function buildPayload(quoteData) {
+  const { quote, character, anime, imageKey } = quoteData;
+  const images = IMAGE_MAP[imageKey];
 
-function generatePayload(quote, character, anime) {
-  const fields = characterMapping[character];
-  const heroField = fields ? fields.hero : null;
-  const smallField = fields ? fields.small : null;
-
-  const dynamic = [
-    { type: 1, name: "daily_quote", value: quote },
-    { type: 1, name: "character_name", value: character },
-    { type: 1, name: "anime_name", value: anime }
-  ];
-
-  // Solo agregar las imágenes del personaje seleccionado (max 2 imágenes)
-  // Esto evita exceder el límite de 30 elementos de Discord
-  if (heroField) {
-    const heroUrl = imageUrls[heroField];
-    log(`Character: ${character}, Hero field: ${heroField}, URL: ${heroUrl || 'NOT FOUND'}`);
-    if (heroUrl) {
-      dynamic.push({ type: 3, name: heroField, value: { url: heroUrl } });
-    } else {
-      log(`WARNING: Image URL not found for ${heroField}. Check if the file exists in /images/`);
-    }
-  }
-  if (smallField) {
-    const smallUrl = imageUrls[smallField];
-    log(`Character: ${character}, Small field: ${smallField}, URL: ${smallUrl || 'NOT FOUND'}`);
-    if (smallUrl) {
-      dynamic.push({ type: 3, name: smallField, value: { url: smallUrl } });
-    } else {
-      log(`WARNING: Image URL not found for ${smallField}. Check if the file exists in /images/`);
-    }
+  if (!images) {
+    log(`⚠️ Warning: No image mapping found for key "${imageKey}". Images will be empty.`);
   }
 
-  return { 
-    data: { 
-      dynamic,
-    },
+  const heroUrl = images 
+    ? `https://raw.githubusercontent.com/${githubUser}/${repoName}/${branch}/images/${images.hero}.png` 
+    : "";
+    
+  const smallUrl = images 
+    ? `https://raw.githubusercontent.com/${githubUser}/${repoName}/${branch}/images/${images.small}.png` 
+    : "";
+
+  log(`🖼️ Hero URL: ${heroUrl}`);
+  log(`🖼️ Small URL: ${smallUrl}`);
+
+  // Payload filtrado: Solo enviamos lo que el layout necesita + las imágenes del personaje actual
+  // Nombres clave: daily_quote, character_name, anime_name, hero_image, small_image
+  return {
+    data: {
+      dynamic: [
+        {
+          type: 1,
+          name: "daily_quote",
+          value: quote
+        },
+        {
+          type: 1,
+          name: "character_name",
+          value: character
+        },
+        {
+          type: 1,
+          name: "anime_name",
+          value: anime
+        },
+        {
+          type: 3,
+          name: "hero_image",
+          value: {
+            url: heroUrl
+          }
+        },
+        {
+          type: 3,
+          name: "small_image",
+          value: {
+            url: smallUrl
+          }
+        }
+      ]
+    }
   };
 }
 
-// ── Discord widget update ──────────────────────────────────────────
-
 async function updateDiscordWidget(payload) {
-  log("Updating Discord widget...");
-
-  const res = await fetch(
-    `https://discord.com/api/v10/applications/${DISCORD_APPLICATION_ID}/users/${DISCORD_USER_ID}/identities/0/profile`,
-    {
-      method: "PATCH",
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'discord.com',
+      port: 443,
+      path: `/api/v10/applications/${DISCORD_APPLICATION_ID}/widget-data`,
+      method: 'PUT',
       headers: {
-        Authorization: `Bot ${DISCORD_TOKEN}`,
-        "Content-Type": "application/json",
-        "User-Agent":
-          "DiscordBot (https://github.com/discord/discord-api-docs, 1.0.0)",
-      },
-      body: JSON.stringify(payload),
-    }
-  );
+        'Authorization': `Bot ${DISCORD_TOKEN}`,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(JSON.stringify(payload))
+      }
+    };
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Discord API ${res.status}: ${text}`);
-  }
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => { data += chunk; });
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve({ status: res.statusCode, body: data });
+        } else {
+          reject(new Error(`Discord API ${res.statusCode}: ${data}`));
+        }
+      });
+    });
 
-  log("Discord widget updated.");
+    req.on('error', (e) => reject(e));
+    req.write(JSON.stringify(payload));
+    req.end();
+  });
 }
-
-// ── FUNCIÓN PRINCIPAL ─────────────────────────────────────────────
 
 async function main() {
-  log("Starting daily quote update...");
-
-  // 1. Read quotes from file
-  const fs = require('fs');
-  const path = require('path');
-  
-  const quotesPath = path.join(__dirname, 'quotes.json');
-  if (!fs.existsSync(quotesPath)) {
-    throw new Error(`Quotes file not found: ${quotesPath}`);
-  }
-  
-  const quotesData = fs.readFileSync(quotesPath, 'utf8');
-  const quotes = JSON.parse(quotesData);
-  
-  if (!Array.isArray(quotes) || quotes.length === 0) {
-    throw new Error('quotes.json is empty or not an array');
+  if (!DISCORD_TOKEN || !DISCORD_APPLICATION_ID || !DISCORD_USER_ID) {
+    log('❌ Error: Missing required environment variables.');
+    process.exit(1);
   }
 
-  // 2. Select random quote
-  const randomIndex = Math.floor(Math.random() * quotes.length);
-  const selected = quotes[randomIndex];
-  
-  log(`Quote: "${selected.quote}"`);
-  log(`Character: ${selected.character}`);
-  log(`Anime: ${selected.anime}`);
+  try {
+    log('Starting daily quote update...');
+    
+    const quoteData = getRandomQuote();
+    log(`Quote: "${quoteData.quote}"`);
+    log(`Character: ${quoteData.character}`);
+    log(`Anime: ${quoteData.anime}`);
 
-  // 3. Check character mapping
-  if (!characterMapping[selected.character]) {
-    log(`WARNING: Character "${selected.character}" not found in mapping.`);
+    const payload = buildPayload(quoteData);
+    
+    log('Updating Discord widget...');
+    const result = await updateDiscordWidget(payload);
+    
+    log('✅ Widget updated successfully!');
+    log('Response:', result.body);
+    
+  } catch (error) {
+    log('❌ Error updating widget:', error.message);
+    process.exit(1);
   }
-
-  // 4. Generate payload
-  const payload = generatePayload(
-    selected.quote,
-    selected.character,
-    selected.anime
-  );
-
-  log("Widget payload:");
-  console.log(JSON.stringify(payload, null, 2));
-
-  // 5. Update Discord widget
-  await updateDiscordWidget(payload);
-
-  log("Daily quote update completed successfully.");
 }
 
-main()
-  .then(() => log("Finished successfully."))
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+main();

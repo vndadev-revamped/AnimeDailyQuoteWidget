@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // ============================================
-// CONFIGURACIÓN
+// CONFIGURACIÓN DESDE VARIABLES DE ENTORNO
 // ============================================
 const CONFIG = {
     DISCORD_TOKEN: process.env.DISCORD_TOKEN || '',
@@ -89,29 +89,20 @@ const characterMapping = {
 // GENERAR PAYLOAD
 // ============================================
 function generatePayload(quote, character, anime) {
-    // Obtener los nombres de los campos de imagen para este personaje
     const fields = characterMapping[character];
-    
-    // Si no existe el personaje en el mapeo, usar placeholders vacíos
     const heroField = fields ? fields.hero : null;
     const smallField = fields ? fields.small : null;
 
-    // Construir el array dynamic
     const dynamic = [
-        // Campos de texto (type 1)
         { type: 1, name: "daily_quote", value: quote },
         { type: 1, name: "character_name", value: character },
         { type: 1, name: "anime_name", value: anime }
     ];
 
-    // Añadir TODOS los campos de imagen (type 3)
-    // Solo los del personaje activo tendrán URL real, el resto estarán vacíos
     for (const [key, url] of Object.entries(imageUrls)) {
-        // Si este campo pertenece al personaje activo, poner la URL real
         if (key === heroField || key === smallField) {
             dynamic.push({ type: 3, name: key, value: { url: url } });
         } else {
-            // Placeholder vacío para el resto
             dynamic.push({ type: 3, name: key, value: { url: "" } });
         }
     }
@@ -163,15 +154,16 @@ async function updateDailyQuote() {
         console.log('\n📦 PAYLOAD GENERADO:');
         console.log(JSON.stringify(payload, null, 2));
         
-        // 6. Enviar a Discord (cuando tengas el token)
-        if (CONFIG.DISCORD_TOKEN && CONFIG.DISCORD_USER_ID) {
-            await sendToDiscord(payload);
-        } else {
-            console.log('\nℹ️ Modo prueba: No se envió a Discord (faltan credenciales)');
-            console.log('   Para enviar, configura DISCORD_TOKEN y DISCORD_USER_ID');
+        // 6. Enviar a Discord
+        if (!CONFIG.DISCORD_TOKEN || !CONFIG.DISCORD_USER_ID) {
+            console.log('\n❌ Error: Faltan credenciales de Discord');
+            console.log('   Asegúrate de configurar DISCORD_TOKEN y DISCORD_USER_ID');
+            process.exit(1);
         }
         
-        console.log('\n✅ Proceso completado');
+        await sendToDiscord(payload);
+        
+        console.log('\n✅ Widget actualizado correctamente');
         
     } catch (error) {
         console.error('❌ Error:', error.message);
@@ -200,7 +192,7 @@ async function sendToDiscord(payload) {
             throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
         
-        console.log('✅ Widget actualizado en Discord');
+        console.log('✅ Envío a Discord exitoso');
         
     } catch (error) {
         console.error('❌ Error al enviar a Discord:', error.message);

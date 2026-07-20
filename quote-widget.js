@@ -128,12 +128,13 @@ function generatePayload(quote, character, anime) {
     { type: 1, name: "anime_name", value: anime }
   ];
 
-  for (const [key, url] of Object.entries(imageUrls)) {
-    if (key === heroField || key === smallField) {
-      dynamic.push({ type: 3, name: key, value: { url: url } });
-    } else {
-      dynamic.push({ type: 3, name: key, value: { url: "" } });
-    }
+  // Solo agregar las imágenes del personaje seleccionado (max 2 imágenes)
+  // Esto evita exceder el límite de 30 elementos de Discord
+  if (heroField && imageUrls[heroField]) {
+    dynamic.push({ type: 3, name: heroField, value: { url: imageUrls[heroField] } });
+  }
+  if (smallField && imageUrls[smallField]) {
+    dynamic.push({ type: 3, name: smallField, value: { url: imageUrls[smallField] } });
   }
 
   return { 

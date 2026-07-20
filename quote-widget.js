@@ -8,7 +8,7 @@ const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || 'TU_USUARIO/TU_REPO';
 
 // Extraer usuario y repo para las URLs de las imágenes
 const [githubUser, repoName] = GITHUB_REPOSITORY.split('/');
-const branch = 'main'; // Asumiendo que las imágenes están en main
+const branch = 'main'; 
 
 // --- DATOS HARDCODEADOS (FUENTE DE VERDAD) ---
 const QUOTES_DATA = [
@@ -94,8 +94,8 @@ function buildPayload(quoteData) {
   log(`🖼️ Hero URL: ${heroUrl}`);
   log(`🖼️ Small URL: ${smallUrl}`);
 
-  // Payload filtrado: Solo enviamos lo que el layout necesita + las imágenes del personaje actual
-  // Nombres clave: daily_quote, character_name, anime_name, hero_image, small_image
+  // IMPORTANTE: Los nombres 'hero_image' y 'small_image' deben coincidir EXACTAMENTE
+  // con lo que espera tu widget-layout.json generado por el plugin.
   return {
     data: {
       dynamic: [

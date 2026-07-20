@@ -137,15 +137,23 @@ function generatePayload(quote, character, anime) {
 
   // Solo agregar las imágenes del personaje seleccionado (max 2 imágenes)
   // Esto evita exceder el límite de 30 elementos de Discord
-  if (heroField && imageUrls[heroField]) {
-    dynamic.push({ type: 3, name: heroField, value: { url: imageUrls[heroField] } });
-  } else if (heroField) {
-    log(`WARNING: Image URL not found for ${heroField}`);
+  if (heroField) {
+    const heroUrl = imageUrls[heroField];
+    log(`Character: ${character}, Hero field: ${heroField}, URL: ${heroUrl || 'NOT FOUND'}`);
+    if (heroUrl) {
+      dynamic.push({ type: 3, name: heroField, value: { url: heroUrl } });
+    } else {
+      log(`WARNING: Image URL not found for ${heroField}. Check if the file exists in /images/`);
+    }
   }
-  if (smallField && imageUrls[smallField]) {
-    dynamic.push({ type: 3, name: smallField, value: { url: imageUrls[smallField] } });
-  } else if (smallField) {
-    log(`WARNING: Image URL not found for ${smallField}`);
+  if (smallField) {
+    const smallUrl = imageUrls[smallField];
+    log(`Character: ${character}, Small field: ${smallField}, URL: ${smallUrl || 'NOT FOUND'}`);
+    if (smallUrl) {
+      dynamic.push({ type: 3, name: smallField, value: { url: smallUrl } });
+    } else {
+      log(`WARNING: Image URL not found for ${smallField}. Check if the file exists in /images/`);
+    }
   }
 
   return { 

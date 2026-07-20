@@ -55,71 +55,71 @@ const IMAGE_BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${R
 // ── URLs DE LAS IMÁGENES ──────────────────────────────────────────
 
 const imageUrls = {
-  "Miku_Nakano_hero": `${IMAGE_BASE_URL}/miku_hero.png`,
-  "miku_small": `${IMAGE_BASE_URL}/miku_small.png`,
-  "Nino_Nakano_hero": `${IMAGE_BASE_URL}/nino_hero.png`,
-  "nino_small": `${IMAGE_BASE_URL}/nino_small.png`,
-  "Itsuki_Nakano_hero": `${IMAGE_BASE_URL}/itsuki_hero.png`,
-  "itsuki_small": `${IMAGE_BASE_URL}/itsuki_small.png`,
-  "Yotsuba_Nakano_hero": `${IMAGE_BASE_URL}/yotsuba_hero.png`,
-  "yotsuba_small": `${IMAGE_BASE_URL}/yotsuba_small.png`,
-  "Ai_Hoshino_hero": `${IMAGE_BASE_URL}/ai_hero.png`,
-  "ai_small": `${IMAGE_BASE_URL}/ai_small.png`,
-  "Frieren_hero": `${IMAGE_BASE_URL}/frieren_hero.png`,
-  "frieren_small": `${IMAGE_BASE_URL}/frieren_small.png`,
-  "Kiyotaka_Ayanokoji_hero": `${IMAGE_BASE_URL}/ayanokoji_hero.png`,
-  "ayanokoji_small": `${IMAGE_BASE_URL}/ayanokoji_small.png`,
-  "Suzune_Horikita_hero": `${IMAGE_BASE_URL}/horikita_hero.png`,
-  "horikita_small": `${IMAGE_BASE_URL}/horikita_small.png`,
-  "Marin_Kitagawa_hero": `${IMAGE_BASE_URL}/marin_hero.png`,
-  "marin_small": `${IMAGE_BASE_URL}/marin_small.png`,
-  "Kaoruko_Waguri_hero": `${IMAGE_BASE_URL}/kaoruko_hero.png`,
-  "kaoruko_small": `${IMAGE_BASE_URL}/kaoruko_small.png`,
-  "Yukino_Yukinoshita_hero": `${IMAGE_BASE_URL}/yukino_hero.png`,
-  "yukino_small": `${IMAGE_BASE_URL}/yukino_small.png`,
-  "Mai_Sakurajima_hero": `${IMAGE_BASE_URL}/mai_hero.png`,
-  "mai_small": `${IMAGE_BASE_URL}/mai_small.png`,
-  "Hori_Kyouko_hero": `${IMAGE_BASE_URL}/hori_hero.png`,
-  "hori_small": `${IMAGE_BASE_URL}/hori_small.png`,
-  "Kana_Arima_hero": `${IMAGE_BASE_URL}/kana_hero.png`,
-  "kana_small": `${IMAGE_BASE_URL}/kana_small.png`,
-  "Akane_Kurokawa_hero": `${IMAGE_BASE_URL}/akane_hero.png`,
-  "akane_small": `${IMAGE_BASE_URL}/akane_small.png`,
-  "Aqua_Hoshino_hero": `${IMAGE_BASE_URL}/aqua_hero.png`,
-  "aqua_small": `${IMAGE_BASE_URL}/aqua_small.png`,
-  "Zero_Two_hero": `${IMAGE_BASE_URL}/zerotwo_hero.png`,
-  "zerotwo_small": `${IMAGE_BASE_URL}/zerotwo_small.png`,
-  "Lucy_hero": `${IMAGE_BASE_URL}/lucy_hero.png`,
-  "lucy_small": `${IMAGE_BASE_URL}/lucy_small.png`,
-  "David_Martinez_hero": `${IMAGE_BASE_URL}/david_hero.png`,
-  "david_small": `${IMAGE_BASE_URL}/david_small.png`,
-  "Rebecca_hero": `${IMAGE_BASE_URL}/rebecca_hero.png`,
-  "rebecca_small": `${IMAGE_BASE_URL}/rebecca_small.png`
+  miku_hero: `${IMAGE_BASE_URL}/miku_hero.png`,
+  miku_small: `${IMAGE_BASE_URL}/miku_small.png`,
+  nino_hero: `${IMAGE_BASE_URL}/nino_hero.png`,
+  nino_small: `${IMAGE_BASE_URL}/nino_small.png`,
+  itsuki_hero: `${IMAGE_BASE_URL}/itsuki_hero.png`,
+  itsuki_small: `${IMAGE_BASE_URL}/itsuki_small.png`,
+  yotsuba_hero: `${IMAGE_BASE_URL}/yotsuba_hero.png`,
+  yotsuba_small: `${IMAGE_BASE_URL}/yotsuba_small.png`,
+  ai_hero: `${IMAGE_BASE_URL}/ai_hero.png`,
+  ai_small: `${IMAGE_BASE_URL}/ai_small.png`,
+  aqua_hero: `${IMAGE_BASE_URL}/aqua_hero.png`,
+  aqua_small: `${IMAGE_BASE_URL}/aqua_small.png`,
+  kana_hero: `${IMAGE_BASE_URL}/kana_hero.png`,
+  kana_small: `${IMAGE_BASE_URL}/kana_small.png`,
+  akane_hero: `${IMAGE_BASE_URL}/akane_hero.png`,
+  akane_small: `${IMAGE_BASE_URL}/akane_small.png`,
+  frieren_hero: `${IMAGE_BASE_URL}/frieren_hero.png`,
+  frieren_small: `${IMAGE_BASE_URL}/frieren_small.png`,
+  ayanokoji_hero: `${IMAGE_BASE_URL}/ayanokoji_hero.png`,
+  ayanokoji_small: `${IMAGE_BASE_URL}/ayanokoji_small.png`,
+  horikita_hero: `${IMAGE_BASE_URL}/horikita_hero.png`,
+  horikita_small: `${IMAGE_BASE_URL}/horikita_small.png`,
+  marin_hero: `${IMAGE_BASE_URL}/marin_hero.png`,
+  marin_small: `${IMAGE_BASE_URL}/marin_small.png`,
+  kaoruko_hero: `${IMAGE_BASE_URL}/kaoruko_hero.png`,
+  kaoruko_small: `${IMAGE_BASE_URL}/kaoruko_small.png`,
+  yukino_hero: `${IMAGE_BASE_URL}/yukino_hero.png`,
+  yukino_small: `${IMAGE_BASE_URL}/yukino_small.png`,
+  mai_hero: `${IMAGE_BASE_URL}/mai_hero.png`,
+  mai_small: `${IMAGE_BASE_URL}/mai_small.png`,
+  hori_hero: `${IMAGE_BASE_URL}/hori_hero.png`,
+  hori_small: `${IMAGE_BASE_URL}/hori_small.png`,
+  zerotwo_hero: `${IMAGE_BASE_URL}/zerotwo_hero.png`,
+  zerotwo_small: `${IMAGE_BASE_URL}/zerotwo_small.png`,
+  lucy_hero: `${IMAGE_BASE_URL}/lucy_hero.png`,
+  lucy_small: `${IMAGE_BASE_URL}/lucy_small.png`,
+  david_hero: `${IMAGE_BASE_URL}/david_hero.png`,
+  david_small: `${IMAGE_BASE_URL}/david_small.png`,
+  rebecca_hero: `${IMAGE_BASE_URL}/rebecca_hero.png`,
+  rebecca_small: `${IMAGE_BASE_URL}/rebecca_small.png`
 };
 
 // ── MAPEO DE PERSONAJES A NOMBRES DE CAMPOS ───────────────────────
 
 const characterMapping = {
-  "Miku Nakano": { hero: "Miku_Nakano_hero", small: "miku_small" },
-  "Nino Nakano": { hero: "Nino_Nakano_hero", small: "nino_small" },
-  "Itsuki Nakano": { hero: "Itsuki_Nakano_hero", small: "itsuki_small" },
-  "Yotsuba Nakano": { hero: "Yotsuba_Nakano_hero", small: "yotsuba_small" },
-  "Ai Hoshino": { hero: "Ai_Hoshino_hero", small: "ai_small" },
-  "Frieren": { hero: "Frieren_hero", small: "frieren_small" },
-  "Kiyotaka Ayanokoji": { hero: "Kiyotaka_Ayanokoji_hero", small: "ayanokoji_small" },
-  "Suzune Horikita": { hero: "Suzune_Horikita_hero", small: "horikita_small" },
-  "Marin Kitagawa": { hero: "Marin_Kitagawa_hero", small: "marin_small" },
-  "Kaoruko Waguri": { hero: "Kaoruko_Waguri_hero", small: "kaoruko_small" },
-  "Yukino Yukinoshita": { hero: "Yukino_Yukinoshita_hero", small: "yukino_small" },
-  "Mai Sakurajima": { hero: "Mai_Sakurajima_hero", small: "mai_small" },
-  "Hori Kyouko": { hero: "Hori_Kyouko_hero", small: "hori_small" },
-  "Kana Arima": { hero: "Kana_Arima_hero", small: "kana_small" },
-  "Akane Kurokawa": { hero: "Akane_Kurokawa_hero", small: "akane_small" },
-  "Aqua Hoshino": { hero: "Aqua_Hoshino_hero", small: "aqua_small" },
-  "Zero Two": { hero: "Zero_Two_hero", small: "zerotwo_small" },
-  "Lucy": { hero: "Lucy_hero", small: "lucy_small" },
-  "David Martinez": { hero: "David_Martinez_hero", small: "david_small" },
-  "Rebecca": { hero: "Rebecca_hero", small: "rebecca_small" }
+  "Miku Nakano": { hero: "miku_hero", small: "miku_small" },
+  "Nino Nakano": { hero: "nino_hero", small: "nino_small" },
+  "Itsuki Nakano": { hero: "itsuki_hero", small: "itsuki_small" },
+  "Yotsuba Nakano": { hero: "yotsuba_hero", small: "yotsuba_small" },
+  "Ai Hoshino": { hero: "ai_hero", small: "ai_small" },
+  "Frieren": { hero: "frieren_hero", small: "frieren_small" },
+  "Kiyotaka Ayanokoji": { hero: "ayanokoji_hero", small: "ayanokoji_small" },
+  "Suzune Horikita": { hero: "horikita_hero", small: "horikita_small" },
+  "Marin Kitagawa": { hero: "marin_hero", small: "marin_small" },
+  "Kaoruko Waguri": { hero: "kaoruko_hero", small: "kaoruko_small" },
+  "Yukino Yukinoshita": { hero: "yukino_hero", small: "yukino_small" },
+  "Mai Sakurajima": { hero: "mai_hero", small: "mai_small" },
+  "Hori Kyouko": { hero: "hori_hero", small: "hori_small" },
+  "Kana Arima": { hero: "kana_hero", small: "kana_small" },
+  "Akane Kurokawa": { hero: "akane_hero", small: "akane_small" },
+  "Aqua Hoshino": { hero: "aqua_hero", small: "aqua_small" },
+  "Zero Two": { hero: "zerotwo_hero", small: "zerotwo_small" },
+  "Lucy": { hero: "lucy_hero", small: "lucy_small" },
+  "David Martinez": { hero: "david_hero", small: "david_small" },
+  "Rebecca": { hero: "rebecca_hero", small: "rebecca_small" }
 };
 
 // ── GENERAR PAYLOAD ───────────────────────────────────────────────
@@ -139,9 +139,13 @@ function generatePayload(quote, character, anime) {
   // Esto evita exceder el límite de 30 elementos de Discord
   if (heroField && imageUrls[heroField]) {
     dynamic.push({ type: 3, name: heroField, value: { url: imageUrls[heroField] } });
+  } else if (heroField) {
+    log(`WARNING: Image URL not found for ${heroField}`);
   }
   if (smallField && imageUrls[smallField]) {
     dynamic.push({ type: 3, name: smallField, value: { url: imageUrls[smallField] } });
+  } else if (smallField) {
+    log(`WARNING: Image URL not found for ${smallField}`);
   }
 
   return { 

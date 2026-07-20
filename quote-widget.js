@@ -41,9 +41,16 @@ function log(message) {
 }
 
 // ── Image Base URL ────────────────────────────────────────────────
-// !!! CAMBIA ESTO POR TU USUARIO DE GITHUB !!!
-const GITHUB_USERNAME = "TU_USUARIO";
-const IMAGE_BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/AnimeQuotesDailyWidget/main/images`;
+// Usa GITHUB_REPOSITORY (ej: "usuario/repo") para obtener el username automáticamente
+const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || "";
+const GITHUB_USERNAME = GITHUB_REPOSITORY.split('/')[0];
+
+if (!GITHUB_USERNAME) {
+  throw new Error("GITHUB_REPOSITORY no está disponible. Asegúrate de correr esto en GitHub Actions.");
+}
+
+const REPO_NAME = GITHUB_REPOSITORY.split('/')[1] || "AnimeQuotesDailyWidget";
+const IMAGE_BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/main/images`;
 
 // ── URLs DE LAS IMÁGENES ──────────────────────────────────────────
 

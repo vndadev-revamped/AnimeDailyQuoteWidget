@@ -1,0 +1,109 @@
+{
+  "_type": "discord-widget",
+  "version": 2,
+  "display_name": "My Widget",
+  "surfaces": {
+    "widget_bottom": {
+      "layout": "widget_bottom_progress",
+      "components": {
+        "progress": {
+          "fields": {
+            "current": {
+              "value_type": "data",
+              "presentation_type": "number",
+              "value": "min"
+            },
+            "max": {
+              "value_type": "data",
+              "presentation_type": "number",
+              "value": "max"
+            }
+          }
+        },
+        "objective": {
+          "fields": {
+            "description": {
+              "value_type": "data",
+              "presentation_type": "text",
+              "value": "character_name"
+            },
+            "image": {
+              "value_type": "data",
+              "presentation_type": "image",
+              "value": "small_image"
+            },
+            "name": {
+              "value_type": "data",
+              "presentation_type": "text",
+              "value": "daily_quote"
+            }
+          }
+        }
+      }
+    },
+    "add_widget_preview": {
+      "layout": "add_widget_preview_hero",
+      "components": {
+        "hero_image": {
+          "fields": {
+            "image": {
+              "value_type": "data",
+              "presentation_type": "image",
+              "value": "change this to an image"
+            }
+          }
+        }
+      }
+    },
+    "widget_top": {
+      "layout": "widget_top_hero",
+      "components": {
+        "title": {
+          "fields": {
+            "text": {
+              "value_type": "custom_string",
+              "presentation_type": "text",
+              "value": "Anime Quotes or smt"
+            }
+          }
+        },
+        "subtitle_1": {
+          "fields": {
+            "text": {
+              "value_type": "custom_string",
+              "presentation_type": "text",
+              "value": "ㅤㅤ"
+            }
+          }
+        },
+        "subtitle_3": {
+          "fields": {
+            "text": {
+              "value_type": "data",
+              "presentation_type": "text",
+              "value": "anime_name"
+            }
+          }
+        },
+        "hero_image": {
+          "fields": {
+            "image": {
+              "value_type": "data",
+              "presentation_type": "image",
+              "value": "hero_image"
+            }
+          }
+        },
+        "subtitle_2": {
+          "fields": {
+            "text": {
+              "value_type": "custom_string",
+              "presentation_type": "text",
+              "value": "Today's quote:"
+            }
+          }
+        }
+      }
+    }
+  }
+}
